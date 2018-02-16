@@ -1,9 +1,7 @@
 
 # coding: utf-8
 
-from .saveAndLoadMechanismForInheritedClasses import SaveAndLoadMechanismForInheritedClasses
-
-class PymorphySentencePartTagToUniversalTagConverter(SaveAndLoadMechanismForInheritedClasses, dict):
+class PymorphySentencePartTagToUniversalTagConverter(dict):
     def __init__(self):
         self["ADJF"] = "ADJ"
         self["ADJS"] = "ADJ"

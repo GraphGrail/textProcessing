@@ -13,11 +13,12 @@ import os
 
 from .pymorphySentencePartTagToUniversalTagConverter import PymorphySentencePartTagToUniversalTagConverter
 
-class TextPreprocessorContextFreeWithMultipleModelsSearch:
+class TextProcessor:
     def __init__(self, fixMisspellings = True, add_POS = False, removeNamedEntities = True):
         self.__pymorphySentencePartTagToUniversalTagConverter = PymorphySentencePartTagToUniversalTagConverter()
         self.__morph = pymorphy2.MorphAnalyzer()
         self.__dictRu = enchant.Dict("ru_RU")
+        #self.__dictEn = enchant.Dict("en_EN")
         
         self.__fixMisspellings = fixMisspellings
         self.__add_POS = add_POS
@@ -44,7 +45,7 @@ class TextPreprocessorContextFreeWithMultipleModelsSearch:
         i = 0
         res = []
         while i < len(wordList):
-            if self.__baseModel.vector_size > 1:
+            if self.__baseModel == None or self.__baseModel.vector_size > 1:
                 res = res + self.tryToHandleWord(wordList[i], vectorsAsResult)
             else:
                 res.append(self.tryToHandleWord(wordList[i], vectorsAsResult))
@@ -178,7 +179,7 @@ class TextPreprocessorContextFreeWithMultipleModelsSearch:
         return correct
     def checkWordByPymorphy(self, word):
         parseResult = self.__morph.parse(word)[0]
-        return TextPreprocessorContextFreeWithMultipleModelsSearch._accordingToMethodsStackAnalizeIsCorrect(parseResult.methods_stack)
+        return TextProcessor._accordingToMethodsStackAnalizeIsCorrect(parseResult.methods_stack)
     @staticmethod   
     def _accordingToMethodsStackAnalizeIsCorrect(methodStack):
         acceptedAnalizerClasses = ["DictionaryAnalyzer", "KnownSuffixAnalyzer", "KnownPrefixAnalyzer"]
@@ -269,7 +270,7 @@ class TextPreprocessorContextFreeWithMultipleModelsSearch:
         
     @staticmethod
     def load(destinationFolder):
-        obj = TextPreprocessorContextFreeWithMultipleModelsSearch()
+        obj = TextProcessor()
         with open(destinationFolder + "/state.json", "r") as inputFile:
             state = json.load(inputFile)
             obj.__significantPymorphy_POS_Set = set(state[0])
@@ -293,6 +294,7 @@ class TextPreprocessorContextFreeWithMultipleModelsSearch:
     __stoplist = None
     __morph = None
     __dictRu = None
+    __dictEn = None
     
     __add_POS = None
     __fixMisspellings = None
